@@ -35,8 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse updateEmployee(UUID id, EmployeeRequest request) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Employee not found with id: " + id));
+        Employee employee = getEmployeeEntity(id);
         employee.setFirstName(request.getFirstName());
         employee.setLastName(request.getLastName());
         employee.setUserName(request.getUsername());
@@ -51,8 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse getEmployee(UUID id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Employee not found with id: " + id));
+        Employee employee = getEmployeeEntity(id);
         return toEmployeeResponse(employee);
     }
 
@@ -71,5 +69,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .createdDate(employee.getCreatedDate())
                 .updatedDate(employee.getUpdatedDate())
                 .build();
+    }
+
+    @Override
+    public Employee getEmployeeEntity(UUID id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Employee not found with id: " + id));
     }
 }

@@ -24,7 +24,9 @@ public class Attendance extends BaseEntity{
 
     @ManyToMany
     @JoinTable(
-            name = "emplo"
+            name = "attendance_id",
+            joinColumns = @JoinColumn(name = "attendance_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private Set<Employee> employees;
 

@@ -15,4 +15,6 @@ public interface EmployeeService {
     void deleteEmployee(UUID id);
     EmployeeResponse getEmployee(UUID id);
     Page<EmployeeResponse> getEmployees(PageRequest pageRequest);
+    Employee getEmployeeEntity(UUID id);
+
 }

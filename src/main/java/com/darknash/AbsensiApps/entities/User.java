@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -14,20 +13,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Employee extends BaseEntity{
+@Table(name = "users")
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    private String userName;
 
-    private String firstName;
+    private String email;
 
-    private String lastName;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
-    @ManyToMany(mappedBy = "employees")
-    private Set<Attendance> attendance;
+    private String password;
 }

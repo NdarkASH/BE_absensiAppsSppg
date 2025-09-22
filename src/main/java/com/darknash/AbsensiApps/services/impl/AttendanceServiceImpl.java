@@ -13,26 +13,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
     private final AttendanceRepository attendanceRepository;
-    private final EmployeeService service;
+    private final EmployeeService employeeService;
 
     @Override
     public AttendanceResponse createAttendance(AttendanceRequest attendanceRequest) {
 
-
+        Set<Employee> employees = attendanceRequest.getEmployeeId()
+                .stream()
+                .map(employeeService::getEmployeeEntity)
+                .collect(Collectors.toSet());
 
         Attendance attendance = new Attendance();
         attendance.setId(UUID.randomUUID());
         attendance.setAttendanceDate(attendanceRequest.getAttendanceDate());
         attendance.setStatus(attendanceRequest.getStatus());
-        attendance.setEmployees();
+        attendance.setEmployees(employees);
         attendanceRepository.save(attendance);
 
         return toAttendanceResponse(attendance);

@@ -27,4 +27,7 @@ public class Attendance extends BaseEntity{
 
     private LocalDateTime attendanceDate;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
 }

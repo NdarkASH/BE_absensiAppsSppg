@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -21,9 +22,11 @@ public class Attendance extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employees;
+    @ManyToMany
+    @JoinTable(
+            name = "emplo"
+    )
+    private Set<Employee> employees;
 
     private LocalDateTime attendanceDate;
 

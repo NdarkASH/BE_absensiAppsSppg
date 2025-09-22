@@ -1,0 +1,75 @@
+package com.darknash.AbsensiApps.services.impl;
+
+import com.darknash.AbsensiApps.dtos.EmployeeRequest;
+import com.darknash.AbsensiApps.dtos.EmployeeResponse;
+import com.darknash.AbsensiApps.entities.Employee;
+import com.darknash.AbsensiApps.repositories.EmployeeRepository;
+import com.darknash.AbsensiApps.services.EmployeeService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class EmployeeServiceImpl implements EmployeeService {
+    private final EmployeeRepository employeeRepository;
+
+
+    @Override
+    public EmployeeResponse createEmployee(EmployeeRequest request) {
+
+        Employee employee = new Employee();
+        employee.setFirstName(request.getFirstName());
+        employee.setLastName(request.getLastName());
+        employee.setUserName(request.getUsername());
+        employeeRepository.save(employee);
+
+        return toEmployeeResponse(employee);
+    }
+
+    @Override
+    public EmployeeResponse updateEmployee(UUID id, EmployeeRequest request) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Employee not found with id: " + id));
+        employee.setFirstName(request.getFirstName());
+        employee.setLastName(request.getLastName());
+        employee.setUserName(request.getUsername());
+        employeeRepository.save(employee);
+        return toEmployeeResponse(employee);
+    }
+
+    @Override
+    public void deleteEmployee(UUID id) {
+        employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public EmployeeResponse getEmployee(UUID id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Employee not found with id: " + id));
+        return toEmployeeResponse(employee);
+    }
+
+    @Override
+    public Page<EmployeeResponse> getEmployees(PageRequest pageRequest) {
+        Page<Employee> employees = employeeRepository.findAll(pageRequest);
+        return employees.map(this::toEmployeeResponse);
+    }
+
+    private EmployeeResponse toEmployeeResponse(Employee employee) {
+        return EmployeeResponse.builder()
+                .id(employee.getId())
+                .firstName(employee.getFirstName())
+                .lastName(employee.getLastName())
+                .username(employee.getUserName())
+                .createdDate(employee.getCreatedDate())
+                .updatedDate(employee.getUpdatedDate())
+                .build();
+    }
+}

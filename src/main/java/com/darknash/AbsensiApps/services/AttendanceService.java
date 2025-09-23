@@ -5,10 +5,11 @@ import com.darknash.AbsensiApps.dtos.AttendanceResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AttendanceService {
-    AttendanceResponse createAttendance(AttendanceRequest attendanceRequest);
+    List<AttendanceResponse> createAttendance(AttendanceRequest attendanceRequest);
     AttendanceResponse updateAttendance(UUID id, AttendanceRequest attendanceRequest);
     void deleteAttendance(UUID id);
     AttendanceResponse getAttendance(UUID id);

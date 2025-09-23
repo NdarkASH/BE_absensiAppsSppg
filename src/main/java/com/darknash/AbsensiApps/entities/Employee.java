@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -28,6 +28,6 @@ public class Employee extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "employees")
-    private Set<Attendance> attendance;
+    @OneToMany(mappedBy = "employees")
+    private List<Attendance> attendance;
 }

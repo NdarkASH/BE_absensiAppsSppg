@@ -1,5 +1,7 @@
 package com.darknash.AbsensiApps.dtos;
 
+import com.darknash.AbsensiApps.entities.Role;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +20,7 @@ public class EmployeeRequest {
     private String firstName;
     @NotNull(message = "Lastname must be fill")
     private String lastName;
+    @NotBlank(message = "Role must be fill")
+    private Role role;
 
 }

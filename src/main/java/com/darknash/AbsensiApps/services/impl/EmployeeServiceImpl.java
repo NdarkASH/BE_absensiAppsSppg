@@ -8,6 +8,7 @@ import com.darknash.AbsensiApps.services.EmployeeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
@@ -28,9 +30,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFirstName(request.getFirstName());
         employee.setLastName(request.getLastName());
         employee.setUserName(request.getUsername());
-        employeeRepository.save(employee);
+        employee.setRole(request.getRole());
+        Employee savedEmployee = employeeRepository.saveAndFlush(employee);
 
-        return toEmployeeResponse(employee);
+        return toEmployeeResponse(savedEmployee);
     }
 
     @Override
@@ -39,11 +42,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFirstName(request.getFirstName());
         employee.setLastName(request.getLastName());
         employee.setUserName(request.getUsername());
-        employeeRepository.save(employee);
-        return toEmployeeResponse(employee);
+        employee.setRole(request.getRole());
+        Employee savedEmployee = employeeRepository.saveAndFlush(employee);
+
+        return toEmployeeResponse(savedEmployee);
     }
 
     @Override
+    @Transactional(rollbackOn =  Exception.class)
     public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
     }
@@ -60,12 +66,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employees.map(this::toEmployeeResponse);
     }
 
+
     private EmployeeResponse toEmployeeResponse(Employee employee) {
         return EmployeeResponse.builder()
                 .id(employee.getId())
                 .firstName(employee.getFirstName())
                 .lastName(employee.getLastName())
                 .username(employee.getUserName())
+                .role(employee.getRole())
                 .createdDate(employee.getCreatedDate())
                 .updatedDate(employee.getUpdatedDate())
                 .build();

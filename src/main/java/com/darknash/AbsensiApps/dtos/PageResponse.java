@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PageResponse {
+public class PageResponse<T> {
 
+    private T data;
     private int page;
     private int size;
     private int total;

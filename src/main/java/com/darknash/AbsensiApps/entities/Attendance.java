@@ -22,13 +22,9 @@ public class Attendance extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToMany
-    @JoinTable(
-            name = "attendance_id",
-            joinColumns = @JoinColumn(name = "attendance_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id")
-    )
-    private Set<Employee> employees;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employees;
 
     private LocalDateTime attendanceDate;
 

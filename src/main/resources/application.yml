@@ -4,6 +4,19 @@ spring:
   application:
     name: AbsensiApps
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    operations-sorter: alpha
+    default-model-rendering: example
+    deep-linking: true
+
+
+
+
 logging:
   file:
     name: logs/app.log

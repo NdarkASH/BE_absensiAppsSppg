@@ -3,10 +3,10 @@ package com.darknash.AbsensiApps.services.impl;
 import com.darknash.AbsensiApps.dtos.AttendanceRequest;
 import com.darknash.AbsensiApps.dtos.AttendanceResponse;
 import com.darknash.AbsensiApps.entities.Attendance;
-import com.darknash.AbsensiApps.entities.Employee;
 import com.darknash.AbsensiApps.repositories.AttendanceRepository;
 import com.darknash.AbsensiApps.services.AttendanceService;
 import com.darknash.AbsensiApps.services.EmployeeService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,9 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 @Transactional
@@ -26,49 +26,65 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final EmployeeService employeeService;
 
     @Override
-    public AttendanceResponse createAttendance(AttendanceRequest attendanceRequest) {
+    public List<AttendanceResponse> createAttendance(AttendanceRequest attendanceRequest) {
 
-        Set<Employee> employees = attendanceRequest.getEmployeeId()
+        List<Attendance> attendances = attendanceRequest.getEmployeeId()
                 .stream()
                 .map(employeeService::getEmployeeEntity)
-                .collect(Collectors.toSet());
+                .map(employee -> {
+                    Attendance attendance = new Attendance();
+                    attendance.setAttendanceDate(attendanceRequest.getAttendanceDate());
+                    attendance.setStatus(attendanceRequest.getStatus());
+                    attendance.setEmployees(employee);
+                    return attendance;
+                }).toList();
+        attendanceRepository.saveAll(attendances);
 
-        Attendance attendance = new Attendance();
-        attendance.setId(UUID.randomUUID());
+        return attendances.stream()
+                .map(this::toAttendanceResponse)
+                .toList();
+    }
+
+    @Override
+    public AttendanceResponse updateAttendance(UUID id, AttendanceRequest attendanceRequest) {
+        Attendance attendance = getAttendanceEntity(id);
         attendance.setAttendanceDate(attendanceRequest.getAttendanceDate());
         attendance.setStatus(attendanceRequest.getStatus());
-        attendance.setEmployees(employees);
         attendanceRepository.save(attendance);
 
         return toAttendanceResponse(attendance);
     }
 
     @Override
-    public AttendanceResponse updateAttendance(UUID id, AttendanceRequest attendanceRequest) {
-        return null;
-    }
-
-    @Override
     public void deleteAttendance(UUID id) {
-
+        attendanceRepository.deleteById(id);
     }
 
     @Override
     public AttendanceResponse getAttendance(UUID id) {
-        return null;
+        Attendance attendance = getAttendanceEntity(id);
+        return toAttendanceResponse(attendance);
     }
 
     @Override
     public Page<AttendanceResponse> getAttendances(PageRequest pageRequest) {
-        return null;
+        Page<Attendance> attendances = attendanceRepository.findAll(pageRequest);
+
+        return attendances.map(this::toAttendanceResponse);
     }
 
+
+    private Attendance getAttendanceEntity(UUID id) {
+        return attendanceRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Attendance with id " + id + " not found"));
+    }
     private AttendanceResponse toAttendanceResponse(Attendance attendance) {
         return AttendanceResponse.builder()
                 .id(UUID.randomUUID())
                 .attendanceDate(attendance.getAttendanceDate())
                 .status(attendance.getStatus())
                 .updatedDate(attendance.getUpdatedDate())
+                .employees(attendance.getEmployees())
                 .createdDate(attendance.getCreatedDate())
                 .build();
     }

@@ -38,7 +38,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                     attendance.setEmployees(employee);
                     return attendance;
                 }).toList();
-        attendanceRepository.saveAll(attendances);
+        attendanceRepository.saveAllAndFlush(attendances);
 
         return attendances.stream()
                 .map(this::toAttendanceResponse)
@@ -50,7 +50,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         Attendance attendance = getAttendanceEntity(id);
         attendance.setAttendanceDate(attendanceRequest.getAttendanceDate());
         attendance.setStatus(attendanceRequest.getStatus());
-        attendanceRepository.save(attendance);
+        attendanceRepository.saveAndFlush(attendance);
 
         return toAttendanceResponse(attendance);
     }
@@ -80,11 +80,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
     private AttendanceResponse toAttendanceResponse(Attendance attendance) {
         return AttendanceResponse.builder()
-                .id(UUID.randomUUID())
+                .id(attendance.getId())
                 .attendanceDate(attendance.getAttendanceDate())
                 .status(attendance.getStatus())
                 .updatedDate(attendance.getUpdatedDate())
-                .employees(attendance.getEmployees())
+                .employees(employeeService.getEmployee(attendance.getEmployees().getId()))
                 .createdDate(attendance.getCreatedDate())
                 .build();
     }

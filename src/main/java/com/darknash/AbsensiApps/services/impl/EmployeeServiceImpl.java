@@ -17,8 +17,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
@@ -49,7 +47,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional(rollbackOn =  Exception.class)
     public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
     }

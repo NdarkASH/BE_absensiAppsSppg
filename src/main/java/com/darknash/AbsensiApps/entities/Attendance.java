@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class Attendance extends BaseEntity{
     @JoinColumn(name = "employee_id")
     private Employee employees;
 
-    private LocalDateTime attendanceDate;
+    private LocalDate attendanceDate;
 
     @Enumerated(EnumType.STRING)
     private Status status;

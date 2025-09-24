@@ -5,17 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PageResponse<T> {
-
-    private T data;
-    private int number;
-    private int size;
-    private long totalPages;
-    private boolean hasNext;
-    private boolean hasPrevious;
+public class LoginRequest {
+    private String email;
+    private String password;
 }

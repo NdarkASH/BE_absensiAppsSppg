@@ -11,9 +11,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +74,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return attendances.map(this::toAttendanceResponse);
     }
+
+    @Override
+    public Page<AttendanceResponse> searchAttendanceByAttendanceDate(Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        Page<Attendance> attendances = attendanceRepository.searchAttendanceByAttendanceDate(startDate, endDate, pageable);
+
+        return attendances.map(this::toAttendanceResponse);
+    }
+
 
 
     private Attendance getAttendanceEntity(UUID id) {

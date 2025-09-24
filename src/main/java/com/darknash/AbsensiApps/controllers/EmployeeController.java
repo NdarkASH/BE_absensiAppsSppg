@@ -29,8 +29,6 @@ public class EmployeeController {
 
         EmployeeResponse employeeResponse = employeeService.createEmployee(employeeRequest);
 
-        log.info(employeeResponse.toString());
-
         return  AppResponse.<EmployeeResponse>builder()
                 .status(HttpStatus.CREATED.getReasonPhrase())
                 .message("Employee Created")
@@ -50,9 +48,11 @@ public class EmployeeController {
 
         PageResponse<List<EmployeeResponse>> pageResponse = PageResponse.<List<EmployeeResponse>>builder()
                 .data(employeeResponses.getContent())
-                .page(employeeResponses.getTotalPages())
+                .number(employeeResponses.getNumber() + 1)
                 .size(employeeResponses.getSize())
-                .total(employeeResponses.getTotalPages())
+                .totalPages(employeeResponses.getTotalElements())
+                .hasPrevious(employeeResponses.hasPrevious())
+                .hasNext(employeeResponses.hasNext())
                 .build();
 
 

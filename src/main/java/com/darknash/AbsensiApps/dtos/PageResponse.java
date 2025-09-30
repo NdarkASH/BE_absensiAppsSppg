@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PageResponse<T> {
 
-    private T data;
+    private T content;
     private int number;
     private int size;
     private long totalPages;

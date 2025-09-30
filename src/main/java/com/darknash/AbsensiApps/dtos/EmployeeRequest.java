@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmployeeRequest {
 
-    @NotNull(message = "Username must be fill")
+    @NotBlank(message = "Username must be fill")
     private String username;
-    @NotNull(message = "Firstname must be fill")
+    @NotBlank(message = "Firstname must be fill")
     private String firstName;
-    @NotNull(message = "Lastname must be fill")
+    @NotBlank(message = "Lastname must be fill")
     private String lastName;
-    @NotBlank(message = "Role must be fill")
+    @NotNull(message = "Role must be fill")
     private Role role;
 
 }

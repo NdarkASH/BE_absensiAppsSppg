@@ -3,6 +3,10 @@ spring:
     active: test
   application:
     name: AbsensiApps
+  datasource:
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 50
 
 springdoc:
   api-docs:

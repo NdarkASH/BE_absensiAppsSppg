@@ -1,6 +1,5 @@
 package com.darknash.AbsensiApps.config;
 
-import com.darknash.AbsensiApps.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +24,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain devSecurity(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll());
+                .cors(cors -> {})
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 

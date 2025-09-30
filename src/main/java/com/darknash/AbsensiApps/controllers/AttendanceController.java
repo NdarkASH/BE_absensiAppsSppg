@@ -5,6 +5,7 @@ import com.darknash.AbsensiApps.dtos.AttendanceRequest;
 import com.darknash.AbsensiApps.dtos.AttendanceResponse;
 import com.darknash.AbsensiApps.dtos.PageResponse;
 import com.darknash.AbsensiApps.services.AttendanceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ public class AttendanceController {
 
 
     @PostMapping
-    public AppResponse<List<AttendanceResponse>> createAttendance(@RequestBody AttendanceRequest attendanceRequest) {
+    public AppResponse<List<AttendanceResponse>> createAttendance(@RequestBody @Valid AttendanceRequest attendanceRequest) {
         List<AttendanceResponse> attendanceResponse = attendanceService.createAttendance(attendanceRequest);
 
         return AppResponse.<List<AttendanceResponse>>builder()
@@ -51,7 +52,7 @@ public class AttendanceController {
                 .totalPages(attendanceResponses.getTotalPages())
                 .hasPrevious(attendanceResponses.hasPrevious())
                 .hasNext(attendanceResponses.hasNext())
-                .data(attendanceResponses.getContent())
+                .content(attendanceResponses.getContent())
                 .build();
 
         return AppResponse.<PageResponse<List<AttendanceResponse>>>builder()
@@ -62,7 +63,7 @@ public class AttendanceController {
     }
 
     @PutMapping(path = "/{id}")
-    public AppResponse<AttendanceResponse> updateAttendance(@PathVariable UUID id, @RequestBody AttendanceRequest attendanceRequest) {
+    public AppResponse<AttendanceResponse> updateAttendance(@PathVariable UUID id, @RequestBody @Valid AttendanceRequest attendanceRequest) {
         AttendanceResponse attendanceResponse = attendanceService.updateAttendance(id, attendanceRequest);
 
         return AppResponse.<AttendanceResponse>builder()
@@ -116,7 +117,7 @@ public class AttendanceController {
                 .totalPages(searchResponse.getTotalElements())
                 .hasNext(searchResponse.hasNext())
                 .hasPrevious(searchResponse.hasPrevious())
-                .data(searchResponse.getContent())
+                .content(searchResponse.getContent())
                 .build();
 
         return AppResponse.<PageResponse<List<AttendanceResponse>>>builder()

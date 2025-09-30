@@ -9,12 +9,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
-app:
-  default-user:
-    email: admin@example.com
-    password: admin123

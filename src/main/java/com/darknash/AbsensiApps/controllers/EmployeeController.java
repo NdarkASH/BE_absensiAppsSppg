@@ -5,6 +5,7 @@ import com.darknash.AbsensiApps.dtos.EmployeeRequest;
 import com.darknash.AbsensiApps.dtos.EmployeeResponse;
 import com.darknash.AbsensiApps.dtos.PageResponse;
 import com.darknash.AbsensiApps.services.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ public class EmployeeController {
 
 
     @PostMapping
-    public AppResponse<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest employeeRequest) {
+    public AppResponse<EmployeeResponse> createEmployee(@RequestBody @Valid EmployeeRequest employeeRequest) {
 
         EmployeeResponse employeeResponse = employeeService.createEmployee(employeeRequest);
 
@@ -47,10 +48,10 @@ public class EmployeeController {
         Page<EmployeeResponse> employeeResponses = employeeService.getEmployees(pageRequest);
 
         PageResponse<List<EmployeeResponse>> pageResponse = PageResponse.<List<EmployeeResponse>>builder()
-                .data(employeeResponses.getContent())
-                .number(employeeResponses.getNumber() + 1)
+                .content(employeeResponses.getContent())
+                .number(employeeResponses.getNumber())
                 .size(employeeResponses.getSize())
-                .totalPages(employeeResponses.getTotalElements())
+                .totalPages(employeeResponses.getTotalPages())
                 .hasPrevious(employeeResponses.hasPrevious())
                 .hasNext(employeeResponses.hasNext())
                 .build();
@@ -65,7 +66,7 @@ public class EmployeeController {
     }
 
     @PutMapping(path = "/{id}")
-    public AppResponse<EmployeeResponse> updateEmployee(@PathVariable UUID id, @RequestBody EmployeeRequest employeeRequest) {
+    public AppResponse<EmployeeResponse> updateEmployee(@PathVariable UUID id, @RequestBody @Valid EmployeeRequest employeeRequest) {
         EmployeeResponse employeeResponse = employeeService.updateEmployee(id, employeeRequest);
 
         return AppResponse.<EmployeeResponse>builder()

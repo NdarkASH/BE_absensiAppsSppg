@@ -1,277 +1,218 @@
-📘 Absensi Apps API Documentation
-Info
+# Dokumentasi API: Absensi Karyawan (v0)
 
-Title: OpenAPI definition
+Dokumen ini menjelaskan *endpoint* yang tersedia berdasarkan spesifikasi OpenAPI v3.0.4.
 
-Version: v0
+**URL Dasar Server:** `http://localhost:8080`
 
-Server URL: http://localhost:8080
+---
 
-👤 Employee API
-Get Employee by ID
+## 1. Employee Controller
 
-GET /employee/{id}
+Mengelola data Karyawan (Pegawai).
 
-Parameters
+### 1.1. Mendapatkan Detail Karyawan (GET)
 
-id (path, string, uuid, required)
+Mendapatkan data detail karyawan berdasarkan ID.
 
-Response
+* **Endpoint:** `GET /employee/{id}`
+* **Operation ID:** `getEmployee`
 
-200 OK → AppResponseEmployeeResponse
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Karyawan. |
 
-Update Employee
+**Respons (200 OK):** Mengembalikan objek `AppResponseEmployeeResponse`.
 
-PUT /employee/{id}
+### 1.2. Memperbarui Data Karyawan (PUT)
 
-Parameters
+Memperbarui data detail karyawan berdasarkan ID.
 
-id (path, string, uuid, required)
+* **Endpoint:** `PUT /employee/{id}`
+* **Operation ID:** `updateEmployee`
 
-Request Body
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Karyawan yang akan diperbarui. |
 
-{
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-  "role": "CUCI | PERSIAPAN | SATPAM | PEMORSIAN | MASAK | AKUNTAN | GIZI | DISTRIBUTOR | ASLAP"
-}
+**Request Body (application/json):** Menggunakan skema `EmployeeRequest`.
 
+**Respons (200 OK):** Mengembalikan objek `AppResponseEmployeeResponse`.
 
-Response
+### 1.3. Menghapus Karyawan (DELETE)
 
-200 OK → AppResponseEmployeeResponse
+Menghapus data karyawan berdasarkan ID.
 
-Delete Employee
+* **Endpoint:** `DELETE /employee/{id}`
+* **Operation ID:** `deleteEmployee`
 
-DELETE /employee/{id}
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Karyawan yang akan dihapus. |
 
-Parameters
+**Respons (200 OK):** Mengembalikan objek `AppResponseVoid` (konfirmasi tanpa data).
 
-id (path, string, uuid, required)
+### 1.4. Mendapatkan Daftar Semua Karyawan (GET)
 
-Response
+Mendapatkan daftar semua karyawan dengan opsi paginasi.
 
-200 OK → AppResponseVoid
+* **Endpoint:** `GET /employee`
+* **Operation ID:** `getAllEmployees`
 
-Get All Employees (Paginated)
+| Parameter | Lokasi | Tipe | Format | Wajib | Default | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **page** | Query | integer | int32 | TIDAK | 0 | Nomor halaman (dimulai dari 0). |
+| **size** | Query | integer | int32 | TIDAK | 10 | Jumlah item per halaman. |
 
-GET /employee
+**Respons (200 OK):** Mengembalikan objek `AppResponsePageResponseListEmployeeResponse` (daftar karyawan dengan informasi paginasi).
 
-Parameters
+### 1.5. Membuat Karyawan Baru (POST)
 
-page (query, integer, default=0)
+Membuat data karyawan baru.
 
-size (query, integer, default=10)
+* **Endpoint:** `POST /employee`
+* **Operation ID:** `createEmployee`
 
-Response
+**Request Body (application/json):** Menggunakan skema `EmployeeRequest`.
 
-200 OK → AppResponsePageResponseListEmployeeResponse
+**Respons (200 OK):** Mengembalikan objek `AppResponseEmployeeResponse` (data karyawan yang baru dibuat).
 
-Create Employee
+---
 
-POST /employee
+## 2. Attendance Controller
 
-Request Body
+Mengelola data Absensi (Kehadiran).
 
-{
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-  "role": "CUCI"
-}
+### 2.1. Mendapatkan Detail Absensi (GET)
 
+Mendapatkan data detail absensi berdasarkan ID.
 
-Response
+* **Endpoint:** `GET /attendance/{id}`
+* **Operation ID:** `readAttendance`
 
-200 OK → AppResponseEmployeeResponse
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Absensi. |
 
-🕒 Attendance API
-Get Attendance by ID
+**Respons (200 OK):** Mengembalikan objek `AppResponseAttendanceResponse`.
 
-GET /attendance/{id}
+### 2.2. Memperbarui Data Absensi (PUT)
 
-Parameters
+Memperbarui data detail absensi berdasarkan ID.
 
-id (path, string, uuid, required)
+* **Endpoint:** `PUT /attendance/{id}`
+* **Operation ID:** `updateAttendance`
 
-Response
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Absensi yang akan diperbarui. |
 
-200 OK → AppResponseAttendanceResponse
+**Request Body (application/json):** Menggunakan skema `AttendanceRequest`.
 
-Update Attendance
+**Respons (200 OK):** Mengembalikan objek `AppResponseAttendanceResponse`.
 
-PUT /attendance/{id}
+### 2.3. Menghapus Absensi (DELETE)
 
-Parameters
+Menghapus data absensi berdasarkan ID.
 
-id (path, string, uuid, required)
+* **Endpoint:** `DELETE /attendance/{id}`
+* **Operation ID:** `deleteAttendance`
 
-Request Body
+| Parameter | Lokasi | Tipe | Format | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **id** | Path | string | uuid | YA | ID unik Absensi yang akan dihapus. |
 
-{
-  "employeeId": ["uuid"],
-  "attendanceDate": "2024-09-01",
-  "status": "ABSEN"
-}
+**Respons (200 OK):** Mengembalikan objek `AppResponseVoid` (konfirmasi tanpa data).
 
+### 2.4. Mendapatkan Daftar Semua Absensi (GET)
 
-Response
+Mendapatkan daftar semua data absensi dengan opsi paginasi.
 
-200 OK → AppResponseAttendanceResponse
+* **Endpoint:** `GET /attendance`
+* **Operation ID:** `readAttendance_1`
 
-Delete Attendance
+| Parameter | Lokasi | Tipe | Format | Wajib | Default | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **page** | Query | integer | int32 | TIDAK | 0 | Nomor halaman (dimulai dari 0). |
+| **size** | Query | integer | int32 | TIDAK | 10 | Jumlah item per halaman. |
 
-DELETE /attendance/{id}
+**Respons (200 OK):** Mengembalikan objek `AppResponsePageResponseListAttendanceResponse` (daftar absensi dengan informasi paginasi).
 
-Parameters
+### 2.5. Membuat Absensi Baru (POST)
 
-id (path, string, uuid, required)
+Membuat data absensi baru.
 
-Response
+* **Endpoint:** `POST /attendance`
+* **Operation ID:** `createAttendance`
 
-200 OK → AppResponseVoid
+**Request Body (application/json):** Menggunakan skema `AttendanceRequest`.
 
-Get All Attendance (Paginated)
+**Respons (200 OK):** Mengembalikan objek `AppResponseListAttendanceResponse` (daftar data absensi yang baru dibuat).
 
-GET /attendance
+### 2.6. Mencari Absensi Berdasarkan Tanggal (GET)
 
-Parameters
+Mencari data absensi dalam rentang tanggal tertentu dengan opsi paginasi dan urutan.
 
-page (query, integer, default=0)
+* **Endpoint:** `GET /attendance/search`
+* **Operation ID:** `searchAttendanceByAttendanceDate`
 
-size (query, integer, default=10)
+| Parameter | Lokasi | Tipe | Format | Wajib | Default | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **startDate** | Query | string | date | TIDAK | | Tanggal mulai rentang pencarian (format `YYYY-MM-DD`). |
+| **endDate** | Query | string | date | TIDAK | | Tanggal akhir rentang pencarian (format `YYYY-MM-DD`). |
+| **size** | Query | integer | int32 | TIDAK | 10 | Jumlah item per halaman. |
+| **page** | Query | integer | int32 | TIDAK | 0 | Nomor halaman (dimulai dari 0). |
+| **ascending** | Query | boolean | | TIDAK | | Urutkan berdasarkan tanggal secara menaik (`true`) atau menurun (`false`). |
 
-Response
+**Respons (200 OK):** Mengembalikan objek `AppResponsePageResponseListAttendanceResponse` (daftar hasil pencarian absensi dengan informasi paginasi).
 
-200 OK → AppResponsePageResponseListAttendanceResponse
+---
 
-Create Attendance
+## 3. Skema Data (Schemas)
 
-POST /attendance
+### EmployeeRequest
 
-Request Body
+Digunakan untuk membuat atau memperbarui data karyawan.
 
-{
-  "employeeId": ["uuid"],
-  "attendanceDate": "2024-09-01",
-  "status": "IZIN"
-}
+| Properti | Tipe | Format | Wajib | Deskripsi | Nilai Enum (Role) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **username** | string | | YA | Nama pengguna (unik). | |
+| **firstName** | string | | YA | Nama depan. | |
+| **lastName** | string | | YA | Nama belakang. | |
+| **role** | string | | YA | Peran/Posisi karyawan. | `CUCI`, `PERSIAPAN`, `SATPAM`, `PEMORSIAN`, `MASAK`, `AKUNTAN`, `GIZI`, `DISTRIBUTOR`, `ASLAP` |
 
+### EmployeeResponse
 
-Response
+Digunakan sebagai format respons data karyawan.
 
-200 OK → AppResponseListAttendanceResponse
+| Properti | Tipe | Format | Deskripsi | Nilai Enum (Role) |
+| :--- | :--- | :--- | :--- | :--- |
+| **id** | string | uuid | ID unik Karyawan. | |
+| **username** | string | | Nama pengguna. | |
+| **firstName** | string | | Nama depan. | |
+| **lastName** | string | | Nama belakang. | |
+| **role** | string | | Peran/Posisi karyawan. | `CUCI`, `PERSIAPAN`, `SATPAM`, `PEMORSIAN`, `MASAK`, `AKUNTAN`, `GIZI`, `DISTRIBUTOR`, `ASLAP` |
+| **createdDate** | string | date-time | Waktu pembuatan data. | |
+| **updatedDate** | string | date-time | Waktu pembaruan data terakhir. | |
 
-Search Attendance by Date Range
+### AttendanceRequest
 
-GET /attendance/search
+Digunakan untuk membuat atau memperbarui data absensi.
 
-Parameters
+| Properti | Tipe | Format | Deskripsi | Nilai Enum (Status) |
+| :--- | :--- | :--- | :--- | :--- |
+| **employeeId** | array | uuid | Daftar ID karyawan yang terkait dengan status absensi ini. | |
+| **attendanceDate** | string | date | Tanggal absensi (format `YYYY-MM-DD`). | |
+| **status** | string | | Status absensi yang akan dicatat. | `ALFA`, `IZIN`, `SAKIT`, `ABSEN` |
 
-startDate (query, string, date)
+### AttendanceResponse
 
-endDate (query, string, date)
+Digunakan sebagai format respons data absensi.
 
-size (query, integer, default=10)
-
-page (query, integer, default=0)
-
-ascending (query, boolean)
-
-Response
-
-200 OK → AppResponsePageResponseListAttendanceResponse
-
-📦 Schemas
-EmployeeRequest
-{
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-  "role": "CUCI | PERSIAPAN | SATPAM | PEMORSIAN | MASAK | AKUNTAN | GIZI | DISTRIBUTOR | ASLAP"
-}
-
-EmployeeResponse
-{
-  "id": "uuid",
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-  "role": "enum",
-  "createdDate": "date-time",
-  "updatedDate": "date-time"
-}
-
-AttendanceRequest
-{
-  "employeeId": ["uuid"],
-  "attendanceDate": "date",
-  "status": "ALFA | IZIN | SAKIT | ABSEN"
-}
-
-AttendanceResponse
-{
-  "id": "uuid",
-  "attendanceDate": "date",
-  "status": "enum",
-  "employees": { ...EmployeeResponse },
-  "createdDate": "date-time",
-  "updatedDate": "date-time"
-}
-
-AppResponseEmployeeResponse
-{
-  "message": "string",
-  "status": "string",
-  "data": { ...EmployeeResponse }
-}
-
-AppResponseAttendanceResponse
-{
-  "message": "string",
-  "status": "string",
-  "data": { ...AttendanceResponse }
-}
-
-AppResponseListAttendanceResponse
-{
-  "message": "string",
-  "status": "string",
-  "data": [ ...AttendanceResponse ]
-}
-
-AppResponsePageResponseListEmployeeResponse
-{
-  "message": "string",
-  "status": "string",
-  "data": {
-    "data": [ ...EmployeeResponse ],
-    "number": 0,
-    "size": 10,
-    "totalPages": 1,
-    "hasNext": true,
-    "hasPrevious": false
-  }
-}
-
-AppResponsePageResponseListAttendanceResponse
-{
-  "message": "string",
-  "status": "string",
-  "data": {
-    "data": [ ...AttendanceResponse ],
-    "number": 0,
-    "size": 10,
-    "totalPages": 1,
-    "hasNext": true,
-    "hasPrevious": false
-  }
-}
-
-AppResponseVoid
-{
-  "message": "string",
-  "status": "string",
-  "data": {}
-}
+| Properti | Tipe | Format | Deskripsi | Nilai Enum (Status) |
+| :--- | :--- | :--- | :--- | :--- |
+| **id** | string | uuid | ID unik Absensi. | |
+| **attendanceDate** | string | date | Tanggal absensi. | |
+| **status** | string | | Status absensi yang dicatat. | `ALFA`, `IZIN`, `SAKIT`, `ABSEN` |
+| **employees** | EmployeeResponse | | Detail karyawan yang terkait (perhatikan ini bisa jadi hanya satu objek, meskipun Request-nya array). | |
+| **createdDate** | string | date-time | Waktu pembuatan data. | |
+| **updatedDate** | string | date-time | Waktu pembaruan data terakhir. | |

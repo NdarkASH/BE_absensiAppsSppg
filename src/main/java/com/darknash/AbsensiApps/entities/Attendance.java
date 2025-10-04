@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -21,10 +23,13 @@ public class Attendance extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employees;
 
-    private LocalDateTime attendanceDate;
+    private LocalDate attendanceDate;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
 }

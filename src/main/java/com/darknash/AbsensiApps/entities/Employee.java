@@ -19,9 +19,15 @@ public class Employee extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     private String userName;
+
     private String firstName;
+
     private String lastName;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @OneToMany(mappedBy = "employees")
     private List<Attendance> attendance;

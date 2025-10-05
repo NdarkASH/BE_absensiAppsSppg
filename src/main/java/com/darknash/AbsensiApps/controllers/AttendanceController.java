@@ -1,9 +1,6 @@
 package com.darknash.AbsensiApps.controllers;
 
-import com.darknash.AbsensiApps.dtos.AppResponse;
-import com.darknash.AbsensiApps.dtos.AttendanceRequest;
-import com.darknash.AbsensiApps.dtos.AttendanceResponse;
-import com.darknash.AbsensiApps.dtos.PageResponse;
+import com.darknash.AbsensiApps.dtos.*;
 import com.darknash.AbsensiApps.services.AttendanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +60,7 @@ public class AttendanceController {
     }
 
     @PutMapping(path = "/{id}")
-    public AppResponse<AttendanceResponse> updateAttendance(@PathVariable UUID id, @RequestBody @Valid AttendanceRequest attendanceRequest) {
+    public AppResponse<AttendanceResponse> updateAttendance(@PathVariable UUID id, @RequestBody @Valid AttendanceRequestUpdate attendanceRequest) {
         AttendanceResponse attendanceResponse = attendanceService.updateAttendance(id, attendanceRequest);
 
         return AppResponse.<AttendanceResponse>builder()

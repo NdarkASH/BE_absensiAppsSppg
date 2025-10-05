@@ -1,6 +1,7 @@
 package com.darknash.AbsensiApps.services.impl;
 
 import com.darknash.AbsensiApps.dtos.AttendanceRequest;
+import com.darknash.AbsensiApps.dtos.AttendanceRequestUpdate;
 import com.darknash.AbsensiApps.dtos.AttendanceResponse;
 import com.darknash.AbsensiApps.entities.Attendance;
 import com.darknash.AbsensiApps.repositories.AttendanceRepository;
@@ -48,10 +49,10 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public AttendanceResponse updateAttendance(UUID id, AttendanceRequest attendanceRequest) {
+    public AttendanceResponse updateAttendance(UUID id, AttendanceRequestUpdate requestUpdate) {
         Attendance attendance = getAttendanceEntity(id);
-        attendance.setAttendanceDate(attendanceRequest.getAttendanceDate());
-        attendance.setStatus(attendanceRequest.getStatus());
+        attendance.setAttendanceDate(requestUpdate.getAttendanceDate());
+        attendance.setStatus(requestUpdate.getStatus());
         attendanceRepository.saveAndFlush(attendance);
 
         return toAttendanceResponse(attendance);
@@ -93,8 +94,8 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .id(attendance.getId())
                 .attendanceDate(attendance.getAttendanceDate())
                 .status(attendance.getStatus())
-                .updatedDate(attendance.getUpdatedDate())
                 .employees(employeeService.getEmployee(attendance.getEmployees().getId()))
+                .updatedDate(attendance.getUpdatedDate())
                 .createdDate(attendance.getCreatedDate())
                 .build();
     }

@@ -5,9 +5,10 @@ FROM eclipse-temurin:21-jdk-jammy AS build
 
 # Tentukan versi GraalVM untuk Java 21
 ENV GRAALVM_VERSION="23.1.2"
-# KOREKSI KRITIS: Menggunakan nama file GraalVM yang sepenuhnya akurat (dengan +9.1)
-ENV GRAALVM_FILE="graalvm-community-jdk-21.0.3+9.1-linux-x64.tar.gz"
-ENV GRAALVM_DIR="graalvm-community-jdk-21.0.3+9.1"
+# KOREKSI KRITIS 1: Mengubah nama file, menambahkan '_bin' untuk keakuratan link.
+ENV GRAALVM_FILE="graalvm-community-jdk-21.0.3_linux-x64_bin.tar.gz"
+# KOREKSI KRITIS 2: Menyederhanakan nama folder yang diekstrak.
+ENV GRAALVM_DIR="graalvm-community-jdk-21.0.3"
 
 WORKDIR /app
 

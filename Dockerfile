@@ -34,7 +34,8 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-RUN ./mvnw clean package -Pnative -DskipTests
+# PERBAIKAN KRITIS UNTUK CRASH: Menggunakan --static untuk static linking
+RUN ./mvnw clean package -Pnative -DskipTests -Dnative-image.args=--static
 
 # PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.
 RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
@@ -43,8 +44,8 @@ RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
 RUN chmod +x target/AbsensiApps
 
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
-# Menggunakan gcr.io/distroless/cc: minimal image yang berisi glibc
-FROM gcr.io/distroless/cc AS runtime
+# Menggunakan 'scratch' KARENA executable sekarang sudah --static (tidak perlu glibc)
+FROM scratch AS runtime
 
 WORKDIR /app
 

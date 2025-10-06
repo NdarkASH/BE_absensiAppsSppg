@@ -1,7 +1,7 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
 # Menggunakan image GraalVM resmi yang stabil untuk kompilasi.
 # Catatan: Kita kembali mencoba image GHCR karena prosesnya lebih bersih dari instalasi manual.
-FROM ghcr.io/graalvm/native-image-community:22.3.2 AS native-builder
+FROM ghcr.io/graalvm/native-image-community:21 AS builder
 
 WORKDIR /app
 

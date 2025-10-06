@@ -1,6 +1,12 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
-# MENGHINDARI MASALAH OTORISASI GHCR DENGAN INSTALASI MANUAL.
-FROM eclipse-temurin:17-jdk-focal AS build
+# MENGHINDARI MASALAH OTORISASI GHCR DENGAN INSTALASI MANUAL (Paling Stabil).
+# Menggunakan Temurin JDK 21
+FROM eclipse-temurin:21-jdk-focal AS build
+
+# Tentukan versi GraalVM untuk Java 21
+ENV GRAALVM_VERSION="23.1.2"
+ENV GRAALVM_FILE="graalvm-community-jdk-21.0.3+9.1-linux-x64.tar.gz"
+ENV GRAALVM_DIR="graalvm-community-jdk-21.0.3+9.1"
 
 WORKDIR /app
 
@@ -11,9 +17,9 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     curl
 
-# Unduh GraalVM Native Image Tooling. (Versi stabil 22.3.3)
-RUN curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.3.3/graalvm-ce-java17-linux-amd64-22.3.3.tar.gz | tar xz -C /usr/local
-RUN mv /usr/local/graalvm-ce-java17-22.3.3 /usr/local/graalvm
+# Unduh GraalVM Native Image Tooling (untuk Java 21) dan set PATH
+RUN curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-${GRAALVM_VERSION}/${GRAALVM_FILE} | tar xz -C /usr/local && \
+    mv /usr/local/${GRAALVM_DIR} /usr/local/graalvm
 ENV PATH="/usr/local/graalvm/bin:$PATH"
 
 # Instal komponen native-image
@@ -34,7 +40,7 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-# Menggunakan --static untuk static linking (mengatasi Exec format error jika runtime adalah scratch)
+# Menggunakan --static untuk static linking (mengatasi Exec format error di scratch)
 RUN ./mvnw clean package -Pnative -DskipTests -Dnative-image.args=--static
 
 # PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.

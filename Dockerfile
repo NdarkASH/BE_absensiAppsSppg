@@ -18,7 +18,7 @@ ENV PATH="/opt/apache-maven-3.9.5/bin:$PATH"
 RUN mvn clean package -Pnative -DskipTests
 
 # Stage 2: Minimal runtime image
-FROM ghcr.io/graalvm/native-image:23-java17 AS runtime
+FROM ghcr.io/graalvm/jdk-minimal:java17 AS runtime
 
 WORKDIR /app
 

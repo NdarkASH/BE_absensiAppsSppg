@@ -1,8 +1,22 @@
-# ----------------------------------------------------
-# STAGE 1: NATIVE BUILD - Membuat Executable Biner
-# ----------------------------------------------------
-# Menggunakan GraalVM JDK 21
-FROM ghcr.io/graalvm/jdk:21 AS native-builder
+FROM ghcr.io/graalvm/graalvm-ce:jdk-21 AS native-builder
+
+# Tambahkan build tools (ini sering dibutuhkan oleh Native Image)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    wget \
+    tar && \
+    rm -rf /var/lib/apt/lists/*
+
+# **INSTALASI MAVEN SECARA MANUAL**
+# Unduh dan ekstrak Maven terbaru
+ENV MAVEN_VERSION 3.9.6
+ENV MAVEN_HOME /usr/share/maven
+RUN wget https://dlcdn.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -P /tmp && \
+    tar xzf /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C /usr/share/ && \
+    mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven && \
+    rm /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+    ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 # Atur direktori kerja
 WORKDIR /app
@@ -12,10 +26,8 @@ COPY pom.xml .
 COPY . .
 
 # Lakukan build Native Image
-# -Pnative: Mengaktifkan profile 'native' Anda yang berisi native-maven-plugin
-# -DskipTests: Melewati unit tests
-# Catatan: Ini adalah langkah yang akan menjalankan tool 'native-image'
-#RUN mvn -Pnative -DskipTests clean package
+# Perintah 'mvn' sekarang sudah tersedia di PATH
+RUN mvn -Pnative -DskipTests clean package
 
 
 # ----------------------------------------------------
@@ -23,15 +35,9 @@ COPY . .
 # ----------------------------------------------------
 FROM gcr.io/distroless/static-debian11
 
-# Atur direktori kerja
+# ... (sisanya sama)
 WORKDIR /app
-
-# Copy executable Native Image yang sudah di-build
 COPY --from=native-builder /app/target/absensiapps /app/absensiapps
-
-# Configuration untuk Port
 ENV PORT=8080
 EXPOSE ${PORT}
-
-# Perintah untuk menjalankan native executable
 ENTRYPOINT ["/app/absensiapps"]

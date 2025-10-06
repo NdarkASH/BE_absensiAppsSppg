@@ -34,20 +34,21 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-# Perintah ini akan menggunakan profile 'native' yang harus didefinisikan di pom.xml
 RUN ./mvnw clean package -Pnative -DskipTests
 
-# PERBAIKAN: Cari executable (AbsensiApps*) dan ganti namanya menjadi AbsensiApps.
-# Ini mencegah error "not found" pada Stage 2.
+# PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.
 RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
 
+# PERBAIKAN 2 KRITIS: Menambahkan izin eksekusi pada executable final
+RUN chmod +x target/AbsensiApps
+
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
-# Menggunakan 'scratch' (image kosong) karena native executable sudah self-contained.
+# Menggunakan 'scratch' (image kosong)
 FROM scratch AS runtime
 
 WORKDIR /app
 
-# COPY sekarang akan berhasil
+# COPY sekarang akan menyalin file yang sudah memiliki izin eksekusi (+x)
 COPY --from=build /app/target/AbsensiApps .
 
 EXPOSE 8080

@@ -37,7 +37,6 @@ COPY src src
 # Panggil profile 'native' yang sudah diperbaiki di pom.xml
 RUN ./mvnw clean package -Pnative -DskipTests
 
----
 
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
 

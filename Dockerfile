@@ -43,8 +43,8 @@ RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
 RUN chmod +x target/AbsensiApps
 
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
-# Menggunakan 'scratch' (image kosong)
-FROM scratch AS runtime
+# Menggunakan gcr.io/distroless/cc: minimal image yang berisi glibc
+FROM gcr.io/distroless/cc AS runtime
 
 WORKDIR /app
 
@@ -54,4 +54,4 @@ COPY --from=build /app/target/AbsensiApps .
 EXPOSE 8080
 
 # Jalankan native executable
-ENTRYPOINT ["./AbsensiApps"]
+ENTRYPOINT ["/app/AbsensiApps"]

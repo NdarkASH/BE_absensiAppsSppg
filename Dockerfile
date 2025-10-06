@@ -1,51 +1,50 @@
 # ----------------------------------------------------
-# STAGE 1: BUILD (Menggunakan image Maven yang lengkap)
+# STAGE 1: BUILD - Mengkompilasi dan membuat JAR
 # ----------------------------------------------------
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Gunakan image Maven 3.9.6 dengan Temurin JDK 17
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-# Tentukan direktori kerja di dalam container
+# Atur direktori kerja
 WORKDIR /app
 
-# Copy pom.xml untuk men-download dependencies lebih dulu (layer caching)
+# Copy pom.xml untuk layer caching dependencies
+# Jika pom.xml tidak berubah, langkah ini akan di-cache, mempercepat build
 COPY pom.xml .
 
-# Optional: Download dependencies
-# Perintah ini di-cache. Jika hanya kode yang berubah, layer ini di-skip.
+# Unduh dependencies Maven (go-offline)
 RUN mvn dependency:go-offline
 
-# Copy seluruh project source code
+# Copy seluruh sumber daya project
 COPY . .
 
-# Optional: set Maven JVM options bila butuh memory lebih saat build
-# Default Railway memory saat build biasanya cukup
-ARG MAVEN_OPTS="-Xmx1024m"
-ENV MAVEN_OPTS=${MAVEN_OPTS}
+# Optional: Set Maven JVM options jika build membutuhkan memori lebih
+# ARG MAVEN_OPTS="-Xmx1024m"
+# ENV MAVEN_OPTS=${MAVEN_OPTS}
 
-# Lakukan build (membuat JAR executable)
-# -DskipTests: Melewati unit tests untuk mempercepat build
-# -Dspring-boot.repackage.skip: Untuk menghindari duplikasi/kesalahan repackage (Opsional)
-RUN mvn -B -e -DskipTests clean package
+# Lakukan build project (skip tests)
+# Jika langkah ini gagal, seperti error sebelumnya (exit code: 1), periksa compile error pada kode Anda
+RUN mvn -B -DskipTests clean package
+
 
 # ----------------------------------------------------
-# STAGE 2: RUNTIME (Menggunakan JRE yang minimal)
+# STAGE 2: RUNTIME - Hanya JRE untuk menjalankan aplikasi
 # ----------------------------------------------------
-# Gunakan JRE image yang kecil dan berbasis Linux (misalnya Jammy)
+# Gunakan JRE minimal (Temurin 17 JRE) untuk ukuran image terkecil
 FROM eclipse-temurin:17-jre-jammy
 
-# Tentukan direktori kerja di dalam container
+# Atur direktori kerja
 WORKDIR /app
 
-# Copy JAR hasil build dari stage 'build'
-# Sesuaikan path 'target/*.jar' jika nama JAR Anda berbeda
-COPY --from=build /app/target/*.jar app.jar
+# Copy JAR yang sudah di-build dari stage 'builder'
+# Sesuaikan 'target/*.jar' jika nama file JAR Anda unik
+COPY --from=builder /app/target/*.jar app.jar
 
-# Configuration untuk Railway
-# Railway akan otomatis mendeteksi port yang perlu dibuka
-ENV PORT 8080
+# Configuration untuk Port
+# Railway akan menggunakan variabel lingkungan PORT
+ENV PORT=8080
 EXPOSE ${PORT}
 
 # Perintah untuk menjalankan aplikasi
-# Railway menggunakan variabel PORT, jadi kita inject ke konfigurasi Spring Boot
-# Catatan: Gunakan format CMD atau ENTRYPOINT yang sesuai dengan standar Docker/Railway
+# Menggunakan exec form untuk startup yang lebih baik dan penanganan sinyal yang benar
+# Spring Boot biasanya secara otomatis membaca PORT dari variabel lingkungan
 ENTRYPOINT ["java", "-jar", "app.jar"]
-# CMD ["--server.port=8080"] # Opsional, jika Anda lebih suka ENTRYPOINT/CMD terpisah

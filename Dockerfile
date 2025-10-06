@@ -1,23 +1,28 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
-# MENGGUNAKAN GRAALVM BERBASIS ALPINE (Musl C Library)
-# Ini menghasilkan executable yang 100% statis dan kompatibel dengan 'scratch'.
-FROM ghcr.io/graalvm/jdk:latest-ol8-slim AS build
+# MENGGUNAKAN ECLIPSE TEMURIN (JDK 17) + INSTALASI MANUAL GRAALVM (SOLUSI PALING STABIL)
+# Ini menghindari masalah '403 Forbidden' dan 'not found' pada image GraalVM GHCR.
+FROM eclipse-temurin:17-jdk-focal AS build
 
 WORKDIR /app
 
-# 1. Instalasi Dependencies (Alpine menggunakan apk, bukan apt-get)
-# Instalasi libz-dev, build-base, dan curl. native-image sudah terpasang.
-# Catatan: Karena kita beralih ke image OL8, kita beralih ke yum/dnf.
-RUN dnf update -y && dnf install -y \
-    zlib-devel \
+# 1. Instalasi Dependencies dan GraalVM Manual
+# Instal dependencies yang dibutuhkan untuk build native (zlib, build-essential)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    zlib1g-dev \
     curl \
+    # Tambahan paket umum yang diperlukan untuk linker GCC pada native build
+    libstdc++-12-dev \
     gcc \
-    gcc-c++ \
-    make \
-    tar \
-    gzip && dnf clean all
+    g++
 
-# (Semua baris instalasi GraalVM manual dan PATH dihapus)
+# Unduh GraalVM Native Image Tooling (Versi stabil 22.3.3)
+RUN curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.3.3/graalvm-ce-java17-linux-amd64-22.3.3.tar.gz | tar xz -C /usr/local
+RUN mv /usr/local/graalvm-ce-java17-22.3.3 /usr/local/graalvm
+ENV PATH="/usr/local/graalvm/bin:$PATH"
+
+# Instal komponen native-image
+RUN gu install native-image
 
 # 2. Optimalisasi Caching Maven
 COPY pom.xml .
@@ -34,8 +39,8 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-# PENTING: Hapus flag --static. Image ini seharusnya memaksa static/musl linking secara otomatis.
-RUN ./mvnw clean package -Pnative -DskipTests
+# PENTING: Menggunakan --static untuk mengatasi masalah Exec Format Error pada runtime 'scratch' (Musl/glibc mismatch).
+RUN ./mvnw clean package -Pnative -DskipTests -Dnative-image.args=--static
 
 # PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.
 RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
@@ -44,7 +49,7 @@ RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
 RUN chmod +x target/AbsensiApps
 
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
-# Menggunakan 'scratch' KARENA executable yang dibangun Musl sudah 100% statis.
+# Menggunakan 'scratch' KARENA executable yang dibangun dengan --static (seharusnya) tidak bergantung pada library OS.
 FROM scratch AS runtime
 
 WORKDIR /app

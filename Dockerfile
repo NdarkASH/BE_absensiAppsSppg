@@ -1,7 +1,7 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
-# Menggunakan image GraalVM resmi yang stabil untuk kompilasi.
-# Catatan: Kita kembali mencoba image GHCR karena prosesnya lebih bersih dari instalasi manual.
-FROM ghcr.io/graalvm/native-image-community:21 AS builder
+# PERBAIKAN: Mengganti image dari 'native-image-community' (bermasalah) ke 'graalvm-ce'
+# Ini adalah tag GraalVM Community Edition yang paling umum dan stabil.
+FROM ghcr.io/graalvm/graalvm-ce:23-java17 AS native-builder
 
 WORKDIR /app
 
@@ -31,7 +31,6 @@ FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 
 # Salin executable (nama file sesuai artifactId: AbsensiApps)
-# Note: debian-slim sering membutuhkan libz1. Jika crash, tambahkan RUN apt-get install -y zlib1g.
 COPY --from=native-builder /app/target/AbsensiApps /app/AbsensiApps
 
 EXPOSE 8080

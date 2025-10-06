@@ -1,43 +1,22 @@
-FROM ghcr.io/graalvm/graalvm-ce:jdk-21 AS native-builder
-
-# Tambahkan build tools (ini sering dibutuhkan oleh Native Image)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    wget \
-    tar && \
-    rm -rf /var/lib/apt/lists/*
-
-# **INSTALASI MAVEN SECARA MANUAL**
-# Unduh dan ekstrak Maven terbaru
-ENV MAVEN_VERSION 3.9.6
-ENV MAVEN_HOME /usr/share/maven
-RUN wget https://dlcdn.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -P /tmp && \
-    tar xzf /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C /usr/share/ && \
-    mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven && \
-    rm /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
-    ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
-
-# Atur direktori kerja
+# Stage 1: Build stage menggunakan Maven (mvn sudah tersedia)
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy pom.xml dan seluruh sumber kode Anda
-COPY pom.xml .
+# Copy seluruh proyek
 COPY . .
 
-# Lakukan build Native Image
-# Perintah 'mvn' sekarang sudah tersedia di PATH
-RUN mvn -Pnative -DskipTests clean package
+# Build jar, skip tests untuk mempercepat build
+RUN mvn -B -DskipTests clean package
 
-
-# ----------------------------------------------------
-# STAGE 2: RUNTIME - Menggunakan Image Minimal (Distroless)
-# ----------------------------------------------------
-FROM gcr.io/distroless/static-debian11
-
-# ... (sisanya sama)
+# Stage 2: Runtime stage menggunakan JRE (lebih ringan)
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=native-builder /app/target/absensiapps /app/absensiapps
+
+# Salin jar hasil build dari stage build
+COPY --from=build /app/target/*.jar app.jar
+
+# Railway memberikan PORT via env var; Spring Boot gunakan --server.port=${PORT}
 ENV PORT=8080
 EXPOSE ${PORT}
-ENTRYPOINT ["/app/absensiapps"]
+
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]

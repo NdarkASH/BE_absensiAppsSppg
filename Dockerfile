@@ -1,7 +1,7 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
 # MENGHINDARI MASALAH OTORISASI GHCR DENGAN INSTALASI MANUAL (Paling Stabil).
-# Menggunakan Temurin JDK 21
-FROM eclipse-temurin:21-jdk-focal AS build
+# Menggunakan Temurin JDK 21 dengan tag yang paling umum dan tersedia
+FROM eclipse-temurin:jdk-21 AS build
 
 # Tentukan versi GraalVM untuk Java 21
 ENV GRAALVM_VERSION="23.1.2"

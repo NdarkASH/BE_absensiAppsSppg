@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    username: ${DB_PROD_USERNAME}
+    password: ${DB_PROD_PASSWORD}
+    url: ${HOST_PROD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 50
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

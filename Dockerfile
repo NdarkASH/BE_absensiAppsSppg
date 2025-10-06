@@ -15,7 +15,7 @@ COPY . .
 # -Pnative: Mengaktifkan profile 'native' Anda yang berisi native-maven-plugin
 # -DskipTests: Melewati unit tests
 # Catatan: Ini adalah langkah yang akan menjalankan tool 'native-image'
-RUN mvn -Pnative -DskipTests clean package
+#RUN mvn -Pnative -DskipTests clean package
 
 
 # ----------------------------------------------------

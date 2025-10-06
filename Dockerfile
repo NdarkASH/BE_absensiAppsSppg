@@ -1,13 +1,21 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
 # MENGGUNAKAN GRAALVM BERBASIS ALPINE (Musl C Library)
 # Ini menghasilkan executable yang 100% statis dan kompatibel dengan 'scratch'.
-FROM ghcr.io/graalvm/jdk:17-al2023 AS build
+FROM ghcr.io/graalvm/jdk:latest-ol8-slim AS build
 
 WORKDIR /app
 
 # 1. Instalasi Dependencies (Alpine menggunakan apk, bukan apt-get)
 # Instalasi libz-dev, build-base, dan curl. native-image sudah terpasang.
-RUN apk update && apk add zlib-dev curl build-base
+# Catatan: Karena kita beralih ke image OL8, kita beralih ke yum/dnf.
+RUN dnf update -y && dnf install -y \
+    zlib-devel \
+    curl \
+    gcc \
+    gcc-c++ \
+    make \
+    tar \
+    gzip && dnf clean all
 
 # (Semua baris instalasi GraalVM manual dan PATH dihapus)
 
@@ -26,7 +34,7 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-# PENTING: Hapus flag --static. Musl (Alpine) akan memaksa static linking secara otomatis.
+# PENTING: Hapus flag --static. Image ini seharusnya memaksa static/musl linking secara otomatis.
 RUN ./mvnw clean package -Pnative -DskipTests
 
 # PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: ${DB_PROD_USERNAME}
-    password: ${DB_PROD_PASSWORD}
-    url: ${HOST_PROD}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 100

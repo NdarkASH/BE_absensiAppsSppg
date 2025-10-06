@@ -2,7 +2,7 @@ spring:
   application:
     name: AbsensiApps
   profiles:
-    active: test
+    active: prod
   datasource:
     username: ${PGUSER}
     password: ${PGPASSWORD}

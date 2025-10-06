@@ -1,23 +1,15 @@
 # Stage 1: BUILD - Mengkompilasi Aplikasi menjadi Native Executable
-# Menggunakan Eclipse Temurin (JDK 17) sebagai base yang stabil dan umum
-FROM eclipse-temurin:17-jdk-focal AS build
+# MENGGUNAKAN GRAALVM BERBASIS ALPINE (Musl C Library)
+# Ini menghasilkan executable yang 100% statis dan kompatibel dengan 'scratch'.
+FROM ghcr.io/graalvm/jdk:17-al2023 AS build
 
 WORKDIR /app
 
-# 1. Instalasi GraalVM Native Image Tooling dan Dependencies
-# Instal dependencies yang dibutuhkan untuk build native (zlib, build-essential)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    zlib1g-dev \
-    curl
+# 1. Instalasi Dependencies (Alpine menggunakan apk, bukan apt-get)
+# Instalasi libz-dev, build-base, dan curl. native-image sudah terpasang.
+RUN apk update && apk add zlib-dev curl build-base
 
-# Unduh GraalVM Native Image Tooling. (Versi stabil 22.3.3)
-RUN curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.3.3/graalvm-ce-java17-linux-amd64-22.3.3.tar.gz | tar xz -C /usr/local
-RUN mv /usr/local/graalvm-ce-java17-22.3.3 /usr/local/graalvm
-ENV PATH="/usr/local/graalvm/bin:$PATH"
-
-# Instal komponen native-image
-RUN gu install native-image
+# (Semua baris instalasi GraalVM manual dan PATH dihapus)
 
 # 2. Optimalisasi Caching Maven
 COPY pom.xml .
@@ -34,8 +26,8 @@ RUN ./mvnw dependency:go-offline -B -DskipTests
 COPY src src
 
 # 4. Build native executable
-# PERBAIKAN KRITIS UNTUK CRASH: Menggunakan --static untuk static linking
-RUN ./mvnw clean package -Pnative -DskipTests -Dnative-image.args=--static
+# PENTING: Hapus flag --static. Musl (Alpine) akan memaksa static linking secara otomatis.
+RUN ./mvnw clean package -Pnative -DskipTests
 
 # PERBAIKAN 1: Cari executable dan ganti namanya menjadi AbsensiApps.
 RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
@@ -44,7 +36,7 @@ RUN find target/ -type f -name 'AbsensiApps*' -exec mv {} target/AbsensiApps \;
 RUN chmod +x target/AbsensiApps
 
 # Stage 2: RUNTIME - Minimal, Aman, dan Cepat
-# Menggunakan 'scratch' KARENA executable sekarang sudah --static (tidak perlu glibc)
+# Menggunakan 'scratch' KARENA executable yang dibangun Musl sudah 100% statis.
 FROM scratch AS runtime
 
 WORKDIR /app

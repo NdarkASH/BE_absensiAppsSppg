@@ -1,50 +1,38 @@
 # ----------------------------------------------------
-# STAGE 1: BUILD - Mengkompilasi dan membuat JAR
+# STAGE 1: NATIVE BUILD - Membuat Executable
 # ----------------------------------------------------
-# Gunakan image Maven 3.9.6 dengan Temurin JDK 17
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
+# Gunakan GraalVM native image builder
+FROM ghcr.io/graalvm/jdk:21 AS native-builder
 
 # Atur direktori kerja
 WORKDIR /app
 
-# Copy pom.xml untuk layer caching dependencies
-# Jika pom.xml tidak berubah, langkah ini akan di-cache, mempercepat build
+# Copy pom.xml dan semua kode
 COPY pom.xml .
-
-# Unduh dependencies Maven (go-offline)
-RUN mvn dependency:go-offline
-
-# Copy seluruh sumber daya project
 COPY . .
 
-# Optional: Set Maven JVM options jika build membutuhkan memori lebih
-# ARG MAVEN_OPTS="-Xmx1024m"
-# ENV MAVEN_OPTS=${MAVEN_OPTS}
-
-# Lakukan build project (skip tests)
-# Jika langkah ini gagal, seperti error sebelumnya (exit code: 1), periksa compile error pada kode Anda
-RUN mvn -B -DskipTests clean package
-
+# Lakukan build Native Image
+# Menggunakan profile 'native' Anda
+# Perintah ini akan memakan waktu LAMA
+RUN mvn -Pnative -DskipTests clean package
 
 # ----------------------------------------------------
-# STAGE 2: RUNTIME - Hanya JRE untuk menjalankan aplikasi
+# STAGE 2: RUNTIME - Menggunakan scratch atau minimal base image
 # ----------------------------------------------------
-# Gunakan JRE minimal (Temurin 17 JRE) untuk ukuran image terkecil
-FROM eclipse-temurin:17-jre-jammy
+# Gunakan image yang sangat minimal (seperti Red Hat UBI minimal atau distroless)
+# distroless adalah yang terbaik untuk keamanan dan ukuran
+FROM gcr.io/distroless/static-debian11
 
 # Atur direktori kerja
 WORKDIR /app
 
-# Copy JAR yang sudah di-build dari stage 'builder'
-# Sesuaikan 'target/*.jar' jika nama file JAR Anda unik
-COPY --from=builder /app/target/*.jar app.jar
+# Copy executable yang sudah di-build dari stage 'native-builder'
+# Executable akan berada di target/app, bukan target/*.jar
+COPY --from=native-builder /app/target/absensiapps /app/absensiapps
 
-# Configuration untuk Port
-# Railway akan menggunakan variabel lingkungan PORT
+# Configuration
 ENV PORT=8080
 EXPOSE ${PORT}
 
-# Perintah untuk menjalankan aplikasi
-# Menggunakan exec form untuk startup yang lebih baik dan penanganan sinyal yang benar
-# Spring Boot biasanya secara otomatis membaca PORT dari variabel lingkungan
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Perintah untuk menjalankan native executable
+ENTRYPOINT ["/app/absensiapps"]
